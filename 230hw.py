@@ -1,4 +1,6 @@
 #!/usr/bin/python
+#Reading statemen list and executing it 
+
 import re
 
 _stmt = "/junk/ && directory => rm $MATCHED ;"
@@ -30,6 +32,26 @@ def execute(stmt_exp, command):
 			_file = True
 		else if(stmt_exp[c] == "_readable"):
 			global _readable
+			_readable = True
+		else if(stmt_exp[c] == "_writeable"):
+			global _writeable
+			_writeable = True
+		else if(stmt_exp[c] == "_executable"):
+			global _executable
+			_executable = True
+		else if(stmt_exp[c][0] == "/"):
+			#Check name of the file or dir 
+		else if(stmt_exp[c][0] == "c"):
+			#Check items content
+		else if(stmt_exp[c][0] == "o"):
+			#Check items owner
+		else if(stmt_exp[c][0] == "p"):
+			#Check permissions
+		else if(stmt_exp[c][0] == "d"):
+			#Check date of the item
+		else if(stmt_exp[c][0] == "s"):
+			#Check size of the item
+
 
 #read statement lines and parse them
 def parse(stmt):
