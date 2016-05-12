@@ -1,0 +1,1 @@
+start && finish && o/melih/ || /^A/ && file && d/01-04-2002/a => echo $MATCHED ; rm $MATCHED ;
