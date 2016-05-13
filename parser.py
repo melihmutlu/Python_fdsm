@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Reading statemen list and executing it 
+#Parser !!
 
 import re
 import os
@@ -7,6 +7,8 @@ import pwd
 import time
 import stat
 
+#Default parameters
+_stmt = ""
 _start = False
 _finish = False
 _directory = False
@@ -14,6 +16,12 @@ _file = False
 _readable = False
 _writeable = False
 _executable = False
+_name = False
+_size = False
+_owner = False
+_perm = False
+_content = False
+_date = False
 file_path = ""
 file_owner =""
 file_size = ""
@@ -24,56 +32,60 @@ file_lmod = ""
 
 #Do proper action regarding to statements and Unix commands
 def execute(stmt_exp, command):
+	global _stmt
+	global _name,_owner,_content,_date,_size
 	l1 = len(stmt_exp)
 	c =0
 	while c<l1 :
 		if stmt_exp[c] == "start":
 			global _start
 			_start = True
-			#stmt_exp = _stmt.replace("start","_start")
+			_stmt = _stmt.replace("start","_start")
 		elif stmt_exp[c] == "finish":
 			global _finish
 			_finish = True
-			#stmt_exp = _stmt.replace("finish","_finish")
+			_stmt = _stmt.replace("finish","_finish")
 		elif stmt_exp[c] == "directory":
 			global _directory
 			_directory = True
-			#stmt_exp = _stmt.replace("directory","_dirctory")
+			_stmt = _stmt.replace("directory","_dirctory")
 		elif stmt_exp[c] == "file":
 			global _file
 			_file = True
-			#stmt_exp = _stmt.replace("file","_file")
-		elif stmt_exp[c] == "_readable":
-			global _readable
-			_readable = True
-			#stmt_exp = _stmt.replace("readable","_readable")
-		elif stmt_exp[c] == "_writeable":
-			global _writeable
-			_writeable = True
-			#stmt_exp = _stmt.replace("_writeable","_writeable")
-		elif stmt_exp[c] == "_executable":
-			global _executable
-			_executable = True
+			_stmt = _stmt.replace("file","_file")
 		elif stmt_exp[c][0] == "/":
 			#Check name of the file or dir
+			_name = nameCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_name")
 			print "name ", nameCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "c":
 			#Check items content
-			contentCheck(stmt_exp[c])
+			_content = contentCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_content")
 		elif stmt_exp[c][0] == "o":
 			#Check items owner
-			print "owner ", ownerCheck(stmt_exp[c])
+			_owner = ownerCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_owner")
+			print "owner ", _owner
 		elif stmt_exp[c][0] == "p":
 			#Check permissions
+			_perm = permCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_perm")
 			print "perm ", permCheck(stmt_exp[c])
 			permCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "d":
 			#Check date of the item
+			_date =  dateCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_date")
 			print "date ", dateCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "s":
 			#Check size of the item
-			print "perm ", sizeCheck(stmt_exp[c])
+			_size = sizeCheck(stmt_exp[c])
+			_stmt = _stmt.replace(stmt_exp[c], "_size" )
+			print "size ", _size
 		c = c+1
+
+#CChecker functions ...
 
 def nameCheck(stmt_exp):
 	length = len(stmt_exp)
@@ -95,6 +107,8 @@ def ownerCheck(stmt_exp):
 	else:
 		return False
 
+#-------------------------------		
+#I don't understand how it works
 def contentCheck(stmt_exp):
 	length = len(stmt_exp)
 	rexp = stmt_exp[2:length-1]
@@ -104,6 +118,7 @@ def contentCheck(stmt_exp):
 		return True
 	else:
 		return False
+#------------------------------
 
 def permCheck(stmt_exp):
 	length = len(stmt_exp)
@@ -138,15 +153,18 @@ def sizeCheck(stmt_exp):
 		return mod_time == file_lmod
 	elif stmt_exp.endswith('l'):
 		rexp = stmt_exp[2:length-2]
-		return rexp >= file_size
+		return rexp > file_size
 	elif stmt_exp.endswith('m'):
-		return rexp <= file_size
+		rexp = stmt_exp[2:length-2]
+		return rexp < file_size
 
 
 #read statement lines and parse them
 def parse(stmt):
+	global _stmt
 	parts =  re.split(r'=>', stmt)
-	stmt_exp = re.split(r'[&| ]', parts[0])
+	_stmt = parts[0]
+	stmt_exp = re.split(r'[&|() ]', parts[0])
 	stmt_exp = filter(None, stmt_exp)
 	command = re.split(r'[;]', parts[1])
 	command = filter(None, command)
@@ -154,26 +172,31 @@ def parse(stmt):
 	print command
 	execute(stmt_exp , command)
 
+#Get info about the file in the given path
 def get_info(filename):
 	global file_owner,file_size,file_access,file_lmod,file_name
+	global _readable, _writeable, _executable
 	st = os.stat(filename)
 	file_name = re.search(r'/(.*$)', filename).groups()[0]
 	file_owner = pwd.getpwuid(st.st_uid).pw_name
 	file_size = st.st_size
 	file_access = oct(stat.S_IMODE(st.st_mode))[1:]
+	_readable = os.access(filename, os.R_OK)
+	_writeable =  os.access(filename, os.W_OK)
+	_executable = os.access(filename, os.X_OK)
 	#last_modified = time.ctime(os.path.getmtime(filename))
 	mod_time = time.strftime('%d/%m/%Y', time.gmtime(os.path.getmtime(filename)))
 	file_lmod = time.strptime(mod_time, '%d/%m/%Y')
 
 
+#Run parser , statementlist path and file or dir path are parameters
 def run(sPath , fPath):
 	global file_path
-	global _stmt 
+	global _stmt
 	file_path = fPath
 	f = open( sPath, 'r+')
-	_stmt = f.readline()
 	get_info(file_path)
-	parse(_stmt)
+	parse(f.readline())
 	
 	print "start", _start
 	print "finish ", _finish
@@ -184,6 +207,13 @@ def run(sPath , fPath):
 	print "exec ",_executable
 	print "access ", file_access
 
-run("testpath.txt" , "./AAA")
+	_stmt = _stmt.replace("&&", "&")
+	_stmt = _stmt.replace("||", "|")
+
+	if eval(_stmt):
+		return file_path
+	else:
+		return None
+
 
 
