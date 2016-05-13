@@ -9,6 +9,7 @@ import stat
 
 #Default parameters
 _stmt = ""
+_commands = ""
 _start = False
 _finish = False
 _directory = False
@@ -47,11 +48,11 @@ def execute(stmt_exp, command):
 			_stmt = _stmt.replace("finish","_finish")
 		elif stmt_exp[c] == "directory":
 			global _directory
-			_directory = True
-			_stmt = _stmt.replace("directory","_dirctory")
+			_directory = os.path.isdir(file_path)
+			_stmt = _stmt.replace("directory","_directory")
 		elif stmt_exp[c] == "file":
 			global _file
-			_file = True
+			_file = os.path.isfile(file_path)
 			_stmt = _stmt.replace("file","_file")
 		elif stmt_exp[c][0] == "/":
 			#Check name of the file or dir
@@ -161,11 +162,12 @@ def sizeCheck(stmt_exp):
 
 #read statement lines and parse them
 def parse(stmt):
-	global _stmt
+	global _stmt, _commands
 	parts =  re.split(r'=>', stmt)
 	_stmt = parts[0]
 	stmt_exp = re.split(r'[&|() ]', parts[0])
 	stmt_exp = filter(None, stmt_exp)
+	_commands = parts[1]
 	command = re.split(r'[;]', parts[1])
 	command = filter(None, command)
 	print stmt_exp
@@ -192,7 +194,7 @@ def get_info(filename):
 #Run parser , statementlist path and file or dir path are parameters
 def run(sPath , fPath):
 	global file_path
-	global _stmt
+	global _stmt,_commands
 	file_path = fPath
 	f = open( sPath, 'r+')
 	get_info(file_path)
@@ -211,9 +213,7 @@ def run(sPath , fPath):
 	_stmt = _stmt.replace("||", "|")
 
 	if eval(_stmt):
-		return file_path
+		return _commands
 	else:
 		return None
-
-
 

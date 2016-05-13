@@ -1,1 +1,1 @@
-(start && s/10/l) || o/melih/  => echo $MATCHED ; rm $MATCHED ;
+(start && s/10/l) && directory && file || o/melih/  => echo $MATCHED ; rm $MATCHED ;
