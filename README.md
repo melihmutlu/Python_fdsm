@@ -7,7 +7,7 @@
 * **-b**: It will traverse the directory in breadth first.
 * **-f**: Use full path name for statements.
 * **-s**: Path of statements file.
-* **-i**: Run on Amazon Cloud machine. <instance> is id of the machine.
+* **-i**: Run on Amazon Cloud machine. Instance id is given.
 
 Syntax for fdsm statement(s) is as follows:
 ```
@@ -15,3 +15,4 @@ Syntax for fdsm statement(s) is as follows:
   ....
   <fdsm expression> => <Unix/Python commands separated by comma> ;
 ```
+Sample statements file included
