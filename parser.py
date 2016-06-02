@@ -237,27 +237,27 @@ def setDefault():
 
 #Run parser , statementlist path and file or dir path are parameters
 def run(sPath , fPath):
+	setDefault()
 	global file_path
-	global _stmt,_commands
+	global _stmt,_commands,_oldcommands
+	_stmt = ""
+	_commands = ""
+	_oldcommands = ""
 	file_path = fPath
 	f = open( sPath, 'r+')
-	get_info(file_path)
-	parse(f.readline())
-	
-	print "start", _start
-	print "finish ", _finish
-	print "dir", _directory
-	print "file", _file
-	print "read ", _readable
-	print "write ",_writeable
-	print "exec ",_executable
-	print "access ", file_access
+	if os.path.exists(file_path) and (file_path != ""):
+		get_info(file_path)
 
-	_stmt = _stmt.replace("&&", "&")
-	_stmt = _stmt.replace("||", "|")
-
-	if eval(_stmt):
-		return _commands
-	else:
+	for line in f:
+		sifirla()
+		parse(line, step, stop)
+		_stmt = _stmt.replace("&&", "&")
+		_stmt = _stmt.replace("||", "|")
+		if eval(_stmt):
+			_oldcommands = _oldcommands + _commands
+		
+	if _oldcommands == "":
 		return None
+	else:
+		return _oldcommands
 
