@@ -1,1 +1,6 @@
-(start && s/10/l) && directory && file || o/melih/  => echo $MATCHED ; rm $MATCHED ;
+start => {count = 0} ;
+/^A/ && file && d/01-04-2002/b => echo $MATCHED ; rm $MATCHED ;
+(/^core$/ || /.+\.o$/ ) && file => rm $MATCHED ;
+/^.*\.py$/ && file => {count = count+1\nprint $MATCHED} ;
+/junk/ && directory => rm $MATCHED ;
+finish => {print count} ;
