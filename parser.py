@@ -39,13 +39,15 @@ def execute(stmt_exp, command):
 	c =0
 	while c<l1 :
 		if stmt_exp[c] == "start":
-			global _start
-			_start = True
 			_stmt = _stmt.replace("start","_start")
+			if step == 0:
+				global _start
+				_start = True
 		elif stmt_exp[c] == "finish":
-			global _finish
-			_finish = True
 			_stmt = _stmt.replace("finish","_finish")
+			if step == stop:
+				global _finish
+				_finish = True
 		elif stmt_exp[c] == "directory":
 			global _directory
 			_directory = os.path.isdir(file_path)
@@ -58,7 +60,7 @@ def execute(stmt_exp, command):
 			#Check name of the file or dir
 			_name = nameCheck(stmt_exp[c])
 			_stmt = _stmt.replace(stmt_exp[c], "_name")
-			print "name ", nameCheck(stmt_exp[c])
+			#print "name ", nameCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "c":
 			#Check items content
 			_content = contentCheck(stmt_exp[c])
@@ -67,24 +69,25 @@ def execute(stmt_exp, command):
 			#Check items owner
 			_owner = ownerCheck(stmt_exp[c])
 			_stmt = _stmt.replace(stmt_exp[c], "_owner")
-			print "owner ", _owner
+			##print "owner ", _owner
 		elif stmt_exp[c][0] == "p":
 			#Check permissions
 			_perm = permCheck(stmt_exp[c])
 			_stmt = _stmt.replace(stmt_exp[c], "_perm")
-			print "perm ", permCheck(stmt_exp[c])
+			##print "perm ", permCheck(stmt_exp[c])
 			permCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "d":
 			#Check date of the item
 			_date =  dateCheck(stmt_exp[c])
 			_stmt = _stmt.replace(stmt_exp[c], "_date")
-			print "date ", dateCheck(stmt_exp[c])
+			##print "date ", dateCheck(stmt_exp[c])
 		elif stmt_exp[c][0] == "s":
 			#Check size of the item
 			_size = sizeCheck(stmt_exp[c])
 			_stmt = _stmt.replace(stmt_exp[c], "_size" )
-			print "size ", _size
+			##print "size ", _size
 		c = c+1
+
 
 #CChecker functions ...
 
