@@ -89,7 +89,7 @@ def execute(stmt_exp, command):
 		c = c+1
 
 
-#CChecker functions ...
+#Checker functions ...
 
 def nameCheck(stmt_exp):
 	length = len(stmt_exp)
@@ -111,8 +111,6 @@ def ownerCheck(stmt_exp):
 	else:
 		return False
 
-#-------------------------------		
-#I don't understand how it works
 def contentCheck(stmt_exp):
 	length = len(stmt_exp)
 	rexp = stmt_exp[2:length-1]
@@ -122,7 +120,6 @@ def contentCheck(stmt_exp):
 		return True
 	else:
 		return False
-#------------------------------
 
 def permCheck(stmt_exp):
 	length = len(stmt_exp)
@@ -164,7 +161,7 @@ def sizeCheck(stmt_exp):
 
 
 #read statement lines and parse them
-def parse(stmt):
+def parse(stmt, step, stop):
 	global _stmt, _commands
 	parts =  re.split(r'=>', stmt)
 	_stmt = parts[0]
@@ -173,9 +170,7 @@ def parse(stmt):
 	_commands = parts[1]
 	command = re.split(r'[;]', parts[1])
 	command = filter(None, command)
-	print stmt_exp
-	print command
-	execute(stmt_exp , command)
+	execute(stmt_exp , command, step, stop)
 
 #Get info about the file in the given path
 def get_info(filename):
@@ -193,6 +188,52 @@ def get_info(filename):
 	mod_time = time.strftime('%d/%m/%Y', time.gmtime(os.path.getmtime(filename)))
 	file_lmod = time.strptime(mod_time, '%d/%m/%Y')
 
+#Default values 	
+def setDefault():
+	global _stmt
+	global _commands
+	global _oldcommands
+	global _start
+	global _finish
+	global _directory
+	global _file
+	global _readable
+	global _writeable
+	global _executable
+	global _name
+	global _size
+	global _owner
+	global _perm
+	global _content
+	global _date
+	global file_path
+	global file_owner
+	global file_size
+	global file_name
+	global file_access
+	global file_lmod
+	#_stmt = ""
+	#_commands = ""
+	#_oldcommands = ""
+	_start = False
+	_finish = False
+	_directory = False
+	_file = False
+	_readable = False
+	_writeable = False
+	_executable = False
+	_name = False
+	_size = False
+	_owner = False
+	_perm = False
+	_content = False
+	_date = False
+	#file_path = ""
+	file_owner =""
+	file_size = ""
+	#file_name = ""
+	file_access = ""
+	file_lmod = ""
 
 #Run parser , statementlist path and file or dir path are parameters
 def run(sPath , fPath):
