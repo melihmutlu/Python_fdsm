@@ -82,6 +82,46 @@ def dirTraverse_DFS(path, step, stop):
 		runFdsm(commands, "")
 
 
+def amazonCloud(optlist,args):
+	import boto3 
+
+	global stmt_file_path
+	instance_id = ""
+	global instance_ip 
+	mark = 0
+	ec2 = boto3.resource('ec2')
+	#Find AWS instance
+	instances = ec2.instances.filter(
+	    Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+	for instance in instances:
+		if instance.instance_id == amazon_instance_path:
+			instance_ip = instance.public_ip_address
+			cmd = " python ./main.py fdsm "
+			for tup in optlist:
+				if not tup[0] == "-i":
+					cmd += tup[0] + " "
+					if not (tup[1] == '' or tup[1].isspace()):
+						cmd += tup[1] + " "
+			print cmd
+
+			keyfile = '-i ./amazon.pem '
+			scpstring = r'scp -o StrictHostKeyChecking=no '
+			sshstring = r'ssh -o StrictHostKeyChecking=no '
+			machine = 'ubuntu@' 
+			files = ' ./parser.py ./main.py ' + stmt_file_path + ' '
+			target = ':/home/ubuntu' 
+			command_scp = scpstring + keyfile + files + machine + instance_ip + target 
+			command_ssh = sshstring + keyfile + machine + instance_ip + cmd 
+
+			subprocess.check_output(command_scp,shell=True)
+			output = subprocess.check_output(command_ssh,shell=True)
+			print output
+			
+			mark = 1
+
+	if mark == 0:
+		print "Error: Id not found"
+		
 
 def dirTraverse_BFS(rootDir):
 	step = 0
@@ -123,7 +163,6 @@ def runFdsm(commands_str, filepath):
 				for temp in ul:
 					if temp == "$MATCHED":
 						ul[ul.index("$MATCHED")] = filepath
-				#print ul
 				subprocess.call(ul)
 
 def main():
